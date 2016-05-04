@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset=utf-8 />
+    <title>EFH Geo Breaks</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+    <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+    <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: whitesmoke;
+            font-family: Lato, sans-serif;
+            color: #0D0000;
+        }
+        
+        header {
+            padding: 6px 10%;
+        }
+        
+        h1 {
+            position: absolute;
+            z-index: 100;
+            top: 10px;
+            left: 60px;
+            padding: 8px 15px;
+            margin: 0;
+            color: whitesmoke;
+            font-size: 1.5em;
+            background: rgba(75, 75, 75, 0.8);
+            border-radius: 5px;
+        }
+        
+        #map {
+            position: absolute;
+            width: 100%;
+            top: 0;
+            bottom: 0;
+        }
+        
+        footer {
+            padding: 6px 10%;
+            width: 80%;
+        }
+        
+        p {
+            font-size: 1em;
+            color: #001323;
+        }
+        
+        .legend {
+            padding: 6px 8px;
+            font-size: 1em;
+            background: rgba(75, 75, 75, 0.8);
+            color: whitesmoke;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            width: 160px;
+        }
+        
+        .legend h3 {
+            font-size: 1.4em;
+            font-weight: bold;
+            line-height: 1em;
+            color: whitesmoke;
+            margin: 0;
+        }
+        
+        .legend li {
+            list-style-type: none;
+            height: 22px;
+        }
+        
+        .legend span {
+            width: 30px;
+            height: 20px;
+            float: left;
+            margin-right: 10px;
+        }
+        
+
+        label {
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+        
+        .info {
+            padding: 6px 8px;
+            font-size: 1em;
+            color: whitesmoke;
+            background: rgba(75, 75, 75, 0.8);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            text-align: right;
+        }
+        
+        .info h3 {
+            margin: 0;
+            color: whitesmoke;
+        }
+    </style>
+</head>
+    
+<body>
+    <h1>EFH Geographic Breaks</h1>
+    
+    <div id='map'></div>
+    
+    <script>
+        // instantiate the Leaflet map
+        var options = {
+            center: [40, -124],
+            zoom: 6,
+            dragging: true,
+            zoomControl: true
+        }
+        var map = L.map('map', options);
+        
+                var esri_ocean = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri &mdash; Sources: GEBCO, NOAA, CHS, OSU, UNH, CSUMB, National Geographic, DeLorme, NAVTEQ, and Esri',
+            maxZoom: 11
+        });
+
+        esri_ocean.addTo(map);
+        L.control.scale().addTo(map);
+        
+        // Layer styles
+        var depLineWeight = 2;
+        
+        var latStyles = {
+            color: "black",
+            weight: 1,
+            opacity: 1
+        }      
+        var dep30Styles = {
+            color: "#006400",
+            weight: depLineWeight,
+            opacity: 1
+        }       
+        var dep100Styles = {
+            color: "#eead0e",
+            weight: depLineWeight,
+            opacity: 1
+        }
+        var dep150Styles = {
+            color: "#8b2500",
+            weight: depLineWeight,
+            opacity: 1
+        }        
+        var dep700Styles = {
+            color: "#104e8b",
+            weight: depLineWeight,
+            opacity: 1
+        }               
+        var eezStyles = {
+            fillColor: "#7f7f7f",
+//            stroke: false,
+            fillOpacity: 0.3,
+            color: "black",
+            weight: 1,
+            opacity: 0.8            
+        }
+
+        // Create the layers and map them
+        var eezLayer = createLayer("data/eez_py.geojson", eezStyles);
+        var latLayer = createLayer("data/strata_lat.geojson", latStyles);
+        var dep30fmLayer = createLayer("data/rca_30fm.geojson",dep30Styles);
+        var dep100fmLayer = createLayer("data/rca_100fm.geojson",dep100Styles);
+        var dep150fmLayer = createLayer("data/rca_150fm.geojson",dep150Styles);
+        var dep700fmLayer = createLayer("data/efh_700fm.geojson",dep700Styles);
+        
+        console.log(eezLayer);  // returns undefined
+        
+        // Layer Switcher   -- Not working because Leaflet GeoJSON layers are not available out here...
+//        var layerLabels = {
+//            "<b style='color:#7f7f7f'>EEZ</b>": eezLayer,
+//            "<b style='color:black'>Latitude Breaks</b>": latLayer,
+//            "<b style='color:#006400'>30 fathoms</b>": dep30fmLayer,
+//            "<b style='color:#eead0e'>100 fathoms</b>": dep100fmLayer,
+//            "<b style='color:#8b2500'>150 fathoms</b>": dep150fmLayer,
+//            "<b style='color:#104e8b'>700 fathoms</b>": dep700fmLayer,
+//        }
+//
+//        L.control.layers(null, layerLabels, {
+//            collapsed: false
+//        }).addTo(map);
+ 
+
+        
+        // Function to create a geoJSON layer using and input GeoJSON data file and style object
+        function createLayer(datafile,styles){
+            
+            var innerLayer;
+
+            // Query AJAX request to latitude strata data file
+            var outerLayer = $.getJSON(datafile, function (data) {
+                
+                
+                // create Leaflet GeoJson layer with GeoJSON data and assign to global variable
+                var innerLayer = L.geoJson(data, {
+                    style: function (feature) { // style for each GeoJSON feature
+                            return styles
+                        }
+                        // add features to the Leaflet map with specfied style
+                }).addTo(map);
+                
+                console.log(innerLayer);  //returns the Leaflet GeoJSON layer object
+                
+                return innerLayer
+            
+            }); // end getJSON
+            
+//            console.log(innerLayer); // returns undefined -- not sure why
+//            console.log(outerLayer); // returns the getJSON result
+            
+//            return outerLayer
+            return innerLayer
+
+            
+        } // end createLayer ()
+        
+
+        
+
+    </script>
+
+    
+</body>
+
+</html>
