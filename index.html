@@ -5,11 +5,20 @@
     <meta charset=utf-8 />
     <title>EFH Geo Breaks</title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
-
+    
+    <!--Remote -->
+    <!--
     <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
     <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+    -->
     <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
+    
+    <!--Local -->
+    <script src="js/jquery-1.11.2.min.js"></script>
+    <script src="js/leaflet.js"></script>
+    <link rel="stylesheet" href="css/leaflet.css" />
+    
 
     <style>
         body {
@@ -175,7 +184,7 @@
         var dep150fmLayer = createLayer("data/rca_150fm.geojson",dep150Styles);
         var dep700fmLayer = createLayer("data/efh_700fm.geojson",dep700Styles);
         
-        console.log(eezLayer);  // returns undefined
+//        console.log(eezLayer);  // returns undefined
         
         // Layer Switcher   -- Not working because Leaflet GeoJSON layers are not available out here...
 //        var layerLabels = {
