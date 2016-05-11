@@ -178,12 +178,12 @@
         }
 
         // Create the layers and map them
-        var eezLayer = createLayer("data/eez_py.geojson", eezStyles);
-        var latLayer = createLayer("data/strata_lat.geojson", latStyles);
-        var dep30fmLayer = createLayer("data/rca_30fm.geojson",dep30Styles);
-        var dep100fmLayer = createLayer("data/rca_100fm.geojson",dep100Styles);
-        var dep150fmLayer = createLayer("data/rca_150fm.geojson",dep150Styles);
-        var dep700fmLayer = createLayer("data/efh_700fm.geojson",dep700Styles);
+//        var eezLayer = createLayer("data/eez_py.geojson", eezStyles);
+//        var latLayer = createLayer("data/strata_lat.geojson", latStyles);
+//        var dep30fmLayer = createLayer("data/rca_30fm.geojson",dep30Styles);
+//        var dep100fmLayer = createLayer("data/rca_100fm.geojson",dep100Styles);
+//        var dep150fmLayer = createLayer("data/rca_150fm.geojson",dep150Styles);
+//        var dep700fmLayer = createLayer("data/efh_700fm.geojson",dep700Styles);
         
 //        console.log(eezLayer);  // returns undefined
         
@@ -200,43 +200,97 @@
 //        L.control.layers(null, layerLabels, {
 //            collapsed: false
 //        }).addTo(map);
+        
+        sources = {
+            "eez": "data/eez_py.geojson",
+            "lat": "data/strata_lat.geojson",
+            "dep30fm": "data/rca_30fm.geojson",
+            "dep100fm": "data/rca_100fm.geojson",
+            "dep150fm": "data/rca_150fm.geojson",
+            "dep700fm": "data/efh_700fm.geojson"    
+        }
+        
+        styles = {
+            "eez": eezStyles,
+            "lat": latStyles,
+            "dep30fm": dep30Styles,
+            "dep100fm": dep100Styles,
+            "dep150fm": dep150Styles,
+            "dep700fm": dep700Styles             
+        }
+       
+        var data = {}; // object to hold JSON data for each layer
+        var layers = {}; // object to hold Leaflet GeoJSON layers
+        
+        // 
+        $.when(
+                $.getJSON(sources["eez"], function(d) {
+                    data["eez"] =  d;
+                }),
+                 $.getJSON(sources["lat"], function(d) {
+                    data["lat"] =  d;
+                }),
+                 $.getJSON(sources["dep30fm"], function(d) {
+                    data["dep30fm"] =  d;
+                }),
+                 $.getJSON(sources["dep100fm"], function(d) {
+                    data["dep100fm"] =  d;
+                }),
+                 $.getJSON(sources["dep150fm"], function(d) {
+                    data["dep150fm"] =  d;
+                }),
+                 $.getJSON(sources["dep700fm"], function(d) {
+                    data["dep700fm"] =  d;
+                })
+                                   
+        ).then(function() {
+
+            // send complete data object to another function to create layers, etc.
+            drawMap(data);
+            
+            // Draw legend with Leaflet GeoJSON layers
+            drawSwitcher(layers);
+
+        });
+        
+
+        // Use the GeoJSON input data to draw Leaflet GeoJSON layers on the map
+        function drawMap(data){
+            
+            for (k in data){ // loop through each input source data layer
+                    
+                // Create Leaflet GeoJSON layer with source GeoJSON data
+                var layer = L.geoJson(data[k], {
+                    style: function (feature) {  // style for each GeoJSON feature
+                        return styles[k]
+                    }
+                }). addTo(map);
+                
+                layers[k] = layer;
+            } // end loop for all source data layers
+            
+        } // end drawMap()
+  
+        
+        function drawSwitcher(layers){
+            
+            // Layer Switcher   -- Not working because Leaflet GeoJSON layers are not available out here...
+            var layerLabels = {
+                "<b style='color:#7f7f7f'>EEZ</b>": layers["eez"],
+                "<b style='color:black'>Latitude Breaks</b>": layers["lat"],
+                "<b style='color:#006400'>30 fathoms</b>": layers["dep30fm"],
+                "<b style='color:#eead0e'>100 fathoms</b>": layers["dep100fm"],
+                "<b style='color:#8b2500'>150 fathoms</b>": layers["dep150fm"],
+                "<b style='color:#104e8b'>700 fathoms</b>": layers["dep700fm"],
+            }
+
+            L.control.layers(null, layerLabels, {
+                collapsed: false
+            }).addTo(map); 
  
+        } // end drawSwitcher()
 
-        
-        // Function to create a geoJSON layer using and input GeoJSON data file and style object
-        function createLayer(datafile,styles){
-            
-            var innerLayer;
-
-            // Query AJAX request to latitude strata data file
-            var outerLayer = $.getJSON(datafile, function (data) {
-                
-                
-                // create Leaflet GeoJson layer with GeoJSON data and assign to global variable
-                var innerLayer = L.geoJson(data, {
-                    style: function (feature) { // style for each GeoJSON feature
-                            return styles
-                        }
-                        // add features to the Leaflet map with specfied style
-                }).addTo(map);
-                
-//                console.log(innerLayer);  //returns the Leaflet GeoJSON layer object
-                
-                return innerLayer
-            
-            }); // end getJSON
-            
-//            console.log(innerLayer); // returns undefined -- not sure why
-//            console.log(outerLayer); // returns the getJSON result
-            
-//            return outerLayer
-            return innerLayer
-
-            
-        } // end createLayer ()
-        
-
-        
+           
 
     </script>
 
