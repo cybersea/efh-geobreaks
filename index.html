@@ -167,7 +167,12 @@
             color: "#104e8b",
             weight: depLineWeight,
             opacity: depOpacity
-        }               
+        }  
+        var tribalUAStyles = {
+            color: "#594600",
+            weight: 2,
+            opacity: 1
+        } 
         var eezStyles = {
             fillColor: "#7f7f7f",
 //            stroke: false,
@@ -176,30 +181,6 @@
             weight: 1,
             opacity: 0.8            
         }
-
-        // Create the layers and map them
-//        var eezLayer = createLayer("data/eez_py.geojson", eezStyles);
-//        var latLayer = createLayer("data/strata_lat.geojson", latStyles);
-//        var dep30fmLayer = createLayer("data/rca_30fm.geojson",dep30Styles);
-//        var dep100fmLayer = createLayer("data/rca_100fm.geojson",dep100Styles);
-//        var dep150fmLayer = createLayer("data/rca_150fm.geojson",dep150Styles);
-//        var dep700fmLayer = createLayer("data/efh_700fm.geojson",dep700Styles);
-        
-//        console.log(eezLayer);  // returns undefined
-        
-        // Layer Switcher   -- Not working because Leaflet GeoJSON layers are not available out here...
-//        var layerLabels = {
-//            "<b style='color:#7f7f7f'>EEZ</b>": eezLayer,
-//            "<b style='color:black'>Latitude Breaks</b>": latLayer,
-//            "<b style='color:#006400'>30 fathoms</b>": dep30fmLayer,
-//            "<b style='color:#eead0e'>100 fathoms</b>": dep100fmLayer,
-//            "<b style='color:#8b2500'>150 fathoms</b>": dep150fmLayer,
-//            "<b style='color:#104e8b'>700 fathoms</b>": dep700fmLayer,
-//        }
-//
-//        L.control.layers(null, layerLabels, {
-//            collapsed: false
-//        }).addTo(map);
         
         sources = {
             "eez": "data/eez_py.geojson",
@@ -207,7 +188,8 @@
             "dep30fm": "data/rca_30fm.geojson",
             "dep100fm": "data/rca_100fm.geojson",
             "dep150fm": "data/rca_150fm.geojson",
-            "dep700fm": "data/efh_700fm.geojson"    
+            "dep700fm": "data/efh_700fm.geojson", 
+            "tribalUA_ln": "data/tribalUA_ln.geojson"
         }
         
         styles = {
@@ -216,7 +198,8 @@
             "dep30fm": dep30Styles,
             "dep100fm": dep100Styles,
             "dep150fm": dep150Styles,
-            "dep700fm": dep700Styles             
+            "dep700fm": dep700Styles,
+            "tribalUA_ln": tribalUAStyles
         }
        
         var data = {}; // object to hold JSON data for each layer
@@ -241,8 +224,11 @@
                 }),
                  $.getJSON(sources["dep700fm"], function(d) {
                     data["dep700fm"] =  d;
-                })
-                                   
+                }),
+                  $.getJSON(sources["tribalUA_ln"], function(d) {
+                    data["tribalUA_ln"] =  d;
+                })  
+            
         ).then(function() {
 
             // send complete data object to another function to create layers, etc.
@@ -282,6 +268,8 @@
                 "<b style='color:#eead0e'>100 fathoms</b>": layers["dep100fm"],
                 "<b style='color:#8b2500'>150 fathoms</b>": layers["dep150fm"],
                 "<b style='color:#104e8b'>700 fathoms</b>": layers["dep700fm"],
+                "<b style='color:#594600'>Tribal U&A</b>": layers["tribalUA_ln"],
+
             }
 
             L.control.layers(null, layerLabels, {
