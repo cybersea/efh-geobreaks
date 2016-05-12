@@ -255,12 +255,17 @@
                 layers[k] = layer;
             } // end loop for all source data layers
             
+            //drawSwitcher(layers);
+            
         } // end drawMap()
   
         
         function drawSwitcher(layers){
             
-            // Layer Switcher   -- Not working because Leaflet GeoJSON layers are not available out here...
+            // Layer Switcher   
+            // Not sure how the order is determined.  Seems to vary.
+            // Doesn't seem to matter if it is called from $.when/.then, or from drawMap() function
+            
             var layerLabels = {
                 "<b style='color:#7f7f7f'>EEZ</b>": layers["eez"],
                 "<b style='color:black'>Latitude Breaks</b>": layers["lat"],
